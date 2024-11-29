@@ -14,10 +14,17 @@ public class ThreadManager {
     	CountDown c1 = new CountDown("C1", 10);
     	CountDown c2 = new CountDown("C2", 8);
     	CountDown c3 = new CountDown("C3", 7);
-    	    	
-    	threads.add(new Thread(c1));
-    	threads.add(new Thread(c2));
-    	threads.add(new Thread(c3));
+    	
+    	Thread thread1 = new Thread(c1);
+        thread1.setName("C1");
+        Thread thread2 = new Thread(c2);
+        thread2.setName("C2");
+        Thread thread3 = new Thread(c3);
+        thread3.setName("C3");
+        
+    	threads.add(thread1);
+    	threads.add(thread2);
+    	threads.add(thread3);
     	
     	for (Thread thread : threads) {
 			thread.start();
@@ -29,33 +36,40 @@ public class ThreadManager {
     public void monitoreaThreads() throws InterruptedException {
         boolean allThreadsTerminated = false;
 
-        // Monitorea hasta que todos los hilos hayan terminado.
-        // Para ello cada 90 milisegundos aproximadamente
-        // almacena en el map para cada hilo la información:
-        //    - clave -> timestamp 
-        //    - valor -> cadena con nombre y estado 
-        //    - ejemplo de la cadena: C1:RUNNABLE
-        // y vefica si todos han terminado.
+        while (!allThreadsTerminated) {
+            allThreadsTerminated = true;
+
+            for (Thread thread : threads) {
+                threadStates.put(System.currentTimeMillis(), thread.getName()+ thread.getState());
+
+                if (thread.getState() != Thread.State.TERMINATED) {
+                    allThreadsTerminated = false;
+                }
+            }
+            Thread.sleep(90);
+        }
+
+        for (Thread thread : threads) {
+            threadStates.put(System.currentTimeMillis(), thread.getName() + ":" + thread.getState());
+        }
     }
 
     public void printThreadStates() {
-        // Imprimir todos los estados registrados en el TreeMap
         System.out.println("\nResumen de estados de los hilos:");
-    }
+        for (Map.Entry<Long, String> datos : threadStates.entrySet()) {
+        	System.out.println("Time " + datos.getKey() + " estado : "+ datos.getValue());
+		}    
+     }
 
     public static void main(String[] args) throws InterruptedException {
         ThreadManager manager = new ThreadManager();
         manager.startThreads();
         manager.monitoreaThreads();
         manager.printThreadStates();
-        // Responde brevemente a las siguientes preguntas:
-        //  1.- Motivo de la frecuencia del estado RUNNABLE
-        //  2.- Motivo de la frecuencia del estado TIMED_WAITING
-        //  3.- Motivo de la frecuencia del estado TERMINATED
         System.out.println("Respuestas a las preguntas");
-        System.out.println("1: ");
-        System.out.println("2: ");
-        System.out.println("3: ");       
+        System.out.println("1: Esto significa que el hilo está arrancado, lo que no se sabe si esta en ejecucion");
+        System.out.println("2: El hilo esta esperando que otro hilo termine");
+        System.out.println("3: Significa que el hilo ha terminado de ejecutarse");       
     }
 
 }
