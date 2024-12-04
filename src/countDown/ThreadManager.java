@@ -35,20 +35,16 @@ public class ThreadManager {
 
     public void monitoreaThreads() throws InterruptedException {
         boolean allThreadsTerminated = false;
-
         while (!allThreadsTerminated) {
             allThreadsTerminated = true;
-
             for (Thread thread : threads) {
                 threadStates.put(System.currentTimeMillis(), thread.getName()+ thread.getState());
-
                 if (thread.getState() != Thread.State.TERMINATED) {
                     allThreadsTerminated = false;
                 }
             }
             Thread.sleep(90);
         }
-
         for (Thread thread : threads) {
             threadStates.put(System.currentTimeMillis(), thread.getName() + ":" + thread.getState());
         }
@@ -71,5 +67,6 @@ public class ThreadManager {
         System.out.println("2: El hilo esta esperando que otro hilo termine");
         System.out.println("3: Significa que el hilo ha terminado de ejecutarse");       
     }
+    
 
 }
